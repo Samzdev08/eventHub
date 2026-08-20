@@ -9,7 +9,7 @@ use PDO;
 
 class EventModel
 {
-    public static function getAllUser()
+    public static function getAllEvent()
     {
         $pdo = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare("
@@ -18,4 +18,6 @@ class EventModel
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    
 }

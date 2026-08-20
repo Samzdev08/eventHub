@@ -21,7 +21,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
 <body>
 
 <nav class="navbar navbar-dark bg-dark px-3">
-    <a class="navbar-brand" href="/events">EventHub</a>
+    <a class="navbar-brand" href="/">EventHub</a>
     <div>
         <a href="/events" class="text-white text-decoration-none me-3">Événements</a>
         <?php if ($isLoggedIn): ?>

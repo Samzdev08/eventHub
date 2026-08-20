@@ -13,14 +13,14 @@ class EventController
 
     public function __invoke(Request $request, Response $response): Response
     {
-        $events = EventModel::getAllUser();
+        $events = EventModel::getAllEvent();
 
-        $view = new PhpRenderer(__DIR__ . '/../Views/layouts', 
+        $view = new PhpRenderer(__DIR__ . '/../Views', 
         ['title' => 'Evénements - EventHub',
          'events' => $events
         ]);
 
-        $view->setLayout('layout.php');
+        $view->setLayout('layouts/layout.php');
         return $view->render($response, 'events/index.php');
     }
 }
