@@ -21,8 +21,12 @@
                         <td>Capacité: <?= $event['capacity'] ?></td>
                         <td><a href="/events/<?= $event['id'] ?>" class="btn btn-sm btn-outline-dark">Voir</a>
                             <a href="/events/<?= $event['id'] ?>/edit" class="btn btn-sm btn-outline-warning">Modifier</a>
+                            <form method="POST" action="/events/<?= $event['id'] ?>/delete" class="d-inline"
+                                onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                            </form>
                         </td>
-                        
+
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -55,5 +59,3 @@
         <p class="text-muted">Vous n'êtes inscrit à aucun événement.</p>
     <?php endif; ?>
 <?php endif; ?>
-
- 

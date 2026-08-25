@@ -83,7 +83,7 @@ class EventController
         return $view->render($response, 'events/profil.php');
     }
 
-    public function create(Request $request, Response $response)
+    public function showCreate(Request $request, Response $response)
     {
         $view = new PhpRenderer(
             __DIR__ . '/../Views',
@@ -93,9 +93,9 @@ class EventController
         );
 
         $view->setLayout('layouts/layout.php');
-        return $view->render($response, 'events/create.php');
+        return $view->render($response, 'events/form.php');
     }
-    public function edit(Request $request, Response $response, array $args)
+    public function showEdit(Request $request, Response $response, array $args)
     {
         $id = $args['id'];
         if ($id == null || !is_numeric($id)) {
@@ -114,11 +114,120 @@ class EventController
             __DIR__ . '/../Views',
             [
                 'title' => 'Modifier un événement - EventHub',
+                'id' => $id,
                 'event' => $event
             ]
         );
 
         $view->setLayout('layouts/layout.php');
-        return $view->render($response, 'events/edit.php');
+        return $view->render($response, 'events/form.php');
+    }
+
+    public function create(Request $request, Response $response, array $args){
+
+        $data = $request->getParsedBody();
+
+        $data['owner_id'] = $_SESSION['user']['id'];
+
+        if($data['title'] == null || $data['description'] == null || $data['event_date'] == null || $data['capacity'] == null){
+            $_SESSION['flash']['error'] = 'Tous les champs sont requis.';
+            return $response->withHeader('Location', '/events/create')->withStatus(302);
+        }
+
+        if(!is_numeric($data['capacity']) || $data['capacity'] <= 0){
+            $_SESSION['flash']['error'] = 'La capacité doit être un nombre positif.';
+            return $response->withHeader('Location', '/events/create')->withStatus(302);
+        }
+
+        if(strtotime($data['event_date']) < time()){
+            $_SESSION['flash']['error'] = 'La date de l\'événement doit être dans le futur.';
+            return $response->withHeader('Location', '/events/create')->withStatus(302);
+        }
+
+        if(strlen($data['title']) > 255){
+            $_SESSION['flash']['error'] = 'Le titre ne doit pas dépasser 255 caractères.';
+            return $response->withHeader('Location', '/events/create')->withStatus(302);
+        }
+
+       if (preg_match('/[^\p{L}\p{N}\s]/u', $data['title'])) {
+            $_SESSION['flash']['error'] = 'Le titre ne doit pas contenir de caractères spéciaux.';
+            return $response->withHeader('Location', '/events/create')->withStatus(302);
+        }
+
+
+        $success = EventModel::createEvent($data);
+
+        if(!$success){
+            $_SESSION['flash']['error'] = 'Une erreur est survenue lors de la création de l\'événement. Veuillez réessayer.';
+            return $response->withHeader('Location', '/events/create')->withStatus(302);
+        }
+
+        $_SESSION['flash']['success'] = 'Événement créé avec succès.';
+        return $response->withHeader('Location', '/events/' . $success)->withStatus(302);
+    }
+
+    public function update(Request $request, Response $response, array $args){
+
+        $id = $args['id'];
+        if ($id == null || !is_numeric($id)) {
+            $_SESSION['flash']['error'] = 'ID invalide';
+            return $response->withHeader('Location', '/events')->withStatus(302);
+        }
+
+        $data = $request->getParsedBody();
+
+        if($data['title'] == null || $data['description'] == null || $data['event_date'] == null || $data['capacity'] == null){
+            $_SESSION['flash']['error'] = 'Tous les champs sont requis.';
+            return $response->withHeader('Location', '/events/' . $id . '/edit')->withStatus(302);
+        }
+
+        if(!is_numeric($data['capacity']) || $data['capacity'] <= 0){
+            $_SESSION['flash']['error'] = 'La capacité doit être un nombre positif.';
+            return $response->withHeader('Location', '/events/' . $id . '/edit')->withStatus(302);
+        }
+
+        if(strtotime($data['event_date']) < time()){
+            $_SESSION['flash']['error'] = 'La date de l\'événement doit être dans le futur.';
+            return $response->withHeader('Location', '/events/' . $id . '/edit')->withStatus(302);
+        }
+
+        if(strlen($data['title']) > 255){
+            $_SESSION['flash']['error'] = 'Le titre ne doit pas dépasser 255 caractères.';
+            return $response->withHeader('Location', '/events/' . $id . '/edit')->withStatus(302);
+        }
+
+        if (preg_match('/[^\p{L}\p{N}\s]/u', $data['title'])) {
+            $_SESSION['flash']['error'] = 'Le titre ne doit pas contenir de caractères spéciaux.';
+            return $response->withHeader('Location', '/events/' . $id . '/edit')->withStatus(302);
+        }
+
+        $success = EventModel::updateEvent($id, $data);
+
+        if(!$success){
+            $_SESSION['flash']['error'] = 'Une erreur est survenue lors de la modification de l\'événement. Veuillez réessayer.';
+            return $response->withHeader('Location', '/events/' . $id . '/edit')->withStatus(302);
+        }
+
+        $_SESSION['flash']['success'] = 'Événement modifié avec succès.';
+        return $response->withHeader('Location', '/events/' . $id)->withStatus(302);
+    }
+
+    public function delete(Request $request, Response $response, array $args){
+
+        $id = $args['id'];
+        if ($id == null || !is_numeric($id)) {
+            $_SESSION['flash']['error'] = 'ID invalide';
+            return $response->withHeader('Location', '/events')->withStatus(302);
+        }
+
+        $success = EventModel::deleteEvent($id);
+
+        if(!$success){
+            $_SESSION['flash']['error'] = 'Une erreur est survenue lors de la suppression de l\'événement. Veuillez réessayer.';
+            return $response->withHeader('Location', '/events')->withStatus(302);
+        }
+
+        $_SESSION['flash']['success'] = 'Événement supprimé avec succès.';
+        return $response->withHeader('Location', '/my-events')->withStatus(302);
     }
 }
