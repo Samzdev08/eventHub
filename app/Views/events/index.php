@@ -10,7 +10,7 @@
             <th>Titre</th>
             <th>Date</th>
             <th>Places</th>
-            <th></th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>

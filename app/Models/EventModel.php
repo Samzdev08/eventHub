@@ -31,5 +31,18 @@ class EventModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public static function getEventByUserId($id)
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->prepare("
+            SELECT id, title, description, event_date, capacity,  owner_id
+            FROM events 
+            WHERE owner_id = :id");
+        $stmt->execute([
+            ':id' => $id
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     
 }

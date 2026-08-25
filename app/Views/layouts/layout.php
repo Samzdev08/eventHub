@@ -4,7 +4,8 @@ session_start();
 $flash = $_SESSION['flash'] ?? [];
 unset($_SESSION['flash']);
 
-$isLoggedIn = isset($_SESSION['user_id']);
+$isLoggedIn = isset($_SESSION['user']['id']);
+$role = $_SESSION['user']['role'] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -33,7 +34,15 @@ $isLoggedIn = isset($_SESSION['user_id']);
         <div>
             <a href="/events" class="text-white text-decoration-none me-3">Événements</a>
             <?php if ($isLoggedIn): ?>
-                <a href="/my-registrations" class="text-white text-decoration-none me-3">Mes inscriptions</a>
+                <?php if($role === 'organizer'): ?>
+                    <a href="/my-events" class="text-white text-decoration-none me-3">Mes evenements</a>
+                    <?php elseif($role === 'admin'): ?>
+                    <a href="/admin" class="text-white text-decoration-none me-3">Admin</a>
+                    <?php else: ?>
+                    <a href="/my-events" class="text-white text-decoration-none me-3">Mes inscription</a>
+                <?php endif; ?>
+
+
                 <form action="/logout" method="POST" class="d-inline">
                     <button type="submit" class="btn btn-sm btn-outline-light">Déconnexion</button>
                 </form>
