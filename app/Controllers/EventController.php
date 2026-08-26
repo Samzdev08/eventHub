@@ -37,14 +37,30 @@ class EventController
             return $response->withHeader('Location', '/events')->withStatus(302);
         }
 
-        /* $idUser = $_SESSION['user_id'] ?? null;
+        $idUser = $_SESSION['user']['id'] ?? null;
+
        
         if($idUser == null) {
             $_SESSION['flash']['error'] = 'Vous devez être connecté pour voir les détails d\'un événement.';
-            return $response->withHeader('Location', '/')->withStatus(302);
-        }*/
+            return $response->withHeader('Location', '/login')->withStatus(302);
+        }
 
+
+        $nbRegistrations = EventModel::countRegistrationsByEventId($id);
         $event = EventModel::getEventById($id);
+        $isRegistred = RegistrationModel::getRegistrationsByUserId($idUser);
+
+        
+        foreach ($isRegistred as $registration) {
+            if ($registration['event_id'] == $id) {
+                $isRegistred = true;
+                break;
+            } else {
+                $isRegistred = false;
+            }
+        }
+
+
 
         if (!$event) {
             $_SESSION['flash']['error'] = 'Événement introuvable.';
@@ -55,7 +71,9 @@ class EventController
             __DIR__ . '/../Views',
             [
                 'title' => 'Evénements - EventHub',
-                'event' => $event
+                'event' => $event,
+                'isRegistred' => $isRegistred,
+                'nbRegistrations' => $nbRegistrations
             ]
         );
 
@@ -73,6 +91,7 @@ class EventController
         } elseif ($role === 'user') {
             $data['registrations'] = RegistrationModel::getRegistrationsByUserId($_SESSION['user']['id']);
         }
+
 
         $view = new PhpRenderer(
             __DIR__ . '/../Views',
@@ -98,16 +117,29 @@ class EventController
     public function showEdit(Request $request, Response $response, array $args)
     {
         $id = $args['id'];
+        $idUser = $_SESSION['user']['id'] ?? null;
+
         if ($id == null || !is_numeric($id)) {
             $_SESSION['flash']['error'] = 'ID invalide';
-            return $response->withHeader('Location', '/events')->withStatus(302);
+            return $response->withHeader('Location', '/my-events')->withStatus(302);
         }
+
+        if ($idUser == null) {
+            $_SESSION['flash']['error'] = 'Vous devez être connecté pour modifier un événement.';
+            return $response->withHeader('Location', '/login')->withStatus(302);
+        }
+
+        if($_SESSION['user']['role'] !== 'admin' && !EventModel::getEventByIdAndUserId($id, $idUser)){
+            $_SESSION['flash']['error'] = 'Vous n\'avez pas la permission de modifier cet événement.';
+            return $response->withHeader('Location', '/my-events')->withStatus(302);
+        }
+
 
         $event = EventModel::getEventById($id);
 
         if (!$event) {
             $_SESSION['flash']['error'] = 'Événement introuvable.';
-            return $response->withHeader('Location', '/events')->withStatus(302);
+            return $response->withHeader('Location', '/my-events')->withStatus(302);
         }
 
         $view = new PhpRenderer(
@@ -116,6 +148,7 @@ class EventController
                 'title' => 'Modifier un événement - EventHub',
                 'id' => $id,
                 'event' => $event
+                
             ]
         );
 
@@ -215,9 +248,21 @@ class EventController
     public function delete(Request $request, Response $response, array $args){
 
         $id = $args['id'];
+        $idUser = $_SESSION['user']['id'] ?? null;
+
         if ($id == null || !is_numeric($id)) {
             $_SESSION['flash']['error'] = 'ID invalide';
             return $response->withHeader('Location', '/events')->withStatus(302);
+        }
+
+        if ($idUser == null) {
+            $_SESSION['flash']['error'] = 'Vous devez être connecté pour supprimer un événement.';
+            return $response->withHeader('Location', '/login')->withStatus(302);
+        }
+
+       if($_SESSION['user']['role'] !== 'admin' && !EventModel::getEventByIdAndUserId($id, $idUser)){
+            $_SESSION['flash']['error'] = 'Vous n\'avez pas la permission de supprimer cet événement.';
+            return $response->withHeader('Location', '/my-events')->withStatus(302);
         }
 
         $success = EventModel::deleteEvent($id);

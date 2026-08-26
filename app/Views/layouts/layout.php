@@ -39,7 +39,7 @@ $role = $_SESSION['user']['role'] ?? null;
                     <?php elseif($role === 'admin'): ?>
                     <a href="/admin" class="text-white text-decoration-none me-3">Admin</a>
                     <?php else: ?>
-                    <a href="/my-events" class="text-white text-decoration-none me-3">Mes inscription</a>
+                    <a href="/my-events" class="text-white text-decoration-none me-3">Mes inscriptions</a>
                 <?php endif; ?>
 
 

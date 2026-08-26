@@ -21,5 +21,5 @@
         <input type="number" class="form-control" id="capacity" name="capacity" value="<?= htmlspecialchars($event['capacity'] ?? '') ?>" required>
     </div>
     <button type="submit" class="btn btn-primary"><?= $id ? 'Modifier' : 'Créer' ?></button>
-    <a href="/my-events" class="btn btn-secondary">Annuler</a>
+    <a onclick="history.back()" class="btn btn-secondary">Annuler</a>
 </form>

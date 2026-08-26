@@ -50,7 +50,7 @@
                     <tr>
                         <td><?= htmlspecialchars($registration['title']) ?></td>
                         <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($registration['event_date']))) ?></td>
-                        <td><a href="/events/<?= $registration['id'] ?>" class="btn btn-sm btn-outline-dark">Voir</a></td>
+                        <td><a href="/events/<?= $registration['event_id'] ?>" class="btn btn-sm btn-outline-dark">Voir</a></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

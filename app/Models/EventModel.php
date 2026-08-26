@@ -31,6 +31,20 @@ class EventModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public static function getEventByIdAndUserId($id, $idUser)
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->prepare("
+            SELECT id, title, description, event_date, capacity, owner_id
+            FROM events
+            WHERE id = :id AND owner_id = :owner_id");
+        $stmt->execute([
+            ':id' => $id,
+            ':owner_id' => $idUser
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public static function getEventByUserId($id)
     {
         $pdo = Database::getInstance()->getConnection();
@@ -84,6 +98,19 @@ class EventModel
         $pdo = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare("DELETE FROM events WHERE id = :id");
         return $stmt->execute([':id' => $id]);
+    }
+
+    public static function countRegistrationsByEventId($eventId)
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) as count
+            FROM registrations r
+            JOIN users u ON r.user_id = u.id
+            WHERE r.event_id = :event_id");
+        $stmt->bindParam(':event_id', $eventId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     
