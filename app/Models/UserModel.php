@@ -74,4 +74,34 @@ class UserModel
 
 
     }
+
+    public static function getAllUsers()
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->query("SELECT id, username, role FROM users");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public static function deleteUser($id)
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
+        return $stmt->execute([':id' => $id]);
+    }
+    public static function changeUserRole($id, $newRole)
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->prepare("UPDATE users SET role = :role WHERE id = :id");
+        return $stmt->execute([
+            ':role' => $newRole,
+            ':id' => $id
+        ]);
+    }
+
+    public static function getUserById($id)
+    {
+        $pdo = Database::getInstance()->getConnection();
+        $stmt = $pdo->prepare("SELECT id, username, role FROM users WHERE id = :id");
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

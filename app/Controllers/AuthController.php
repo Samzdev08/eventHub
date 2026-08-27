@@ -13,7 +13,7 @@ class AuthController
 
     public function register(Request $request, Response $response): Response
     {
-
+       
 
         $view = new PhpRenderer(
             __DIR__ . '/../Views',
@@ -28,6 +28,8 @@ class AuthController
 
     public function login(Request $request, Response $response): Response
     {
+       
+
         $view = new PhpRenderer(
             __DIR__ . '/../Views',
             [
@@ -41,6 +43,8 @@ class AuthController
 
     public function logout(Request $request, Response $response): Response
     {
+
+        
 
         session_destroy();
 

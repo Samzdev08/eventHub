@@ -37,11 +37,12 @@ $role = $_SESSION['user']['role'] ?? null;
                 <?php if($role === 'organizer'): ?>
                     <a href="/my-events" class="text-white text-decoration-none me-3">Mes evenements</a>
                     <?php elseif($role === 'admin'): ?>
-                    <a href="/admin" class="text-white text-decoration-none me-3">Admin</a>
+
+                    <a href="/my-events" class="text-white text-decoration-none me-3">Admin</a>
                     <?php else: ?>
+
                     <a href="/my-events" class="text-white text-decoration-none me-3">Mes inscriptions</a>
                 <?php endif; ?>
-
 
                 <form action="/logout" method="POST" class="d-inline">
                     <button type="submit" class="btn btn-sm btn-outline-light">Déconnexion</button>
